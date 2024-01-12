@@ -68,6 +68,7 @@ namespace MovieLibrary
             });
 
             services.AddSingleton<IDataSource, MovieService>();
+            services.AddSingleton<IRabbitMqService, RabbitMqService>();
 
             // Viewmodels
             services.AddTransient<MainViewModel>();
