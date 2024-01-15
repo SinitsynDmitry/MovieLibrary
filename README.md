@@ -19,9 +19,10 @@ File: appsettings.json
       "Microsoft.Hosting.Lifetime": "Information"
     }
   },
-  "RabbitMQ": {
+  "RabbitMQSettings": {
     "HostName": "localhost",
     "Port": 5672,
     "QueueName": "data_queue"
   }
+}
 ```
