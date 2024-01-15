@@ -16,6 +16,9 @@ using MovieData.Interfaces;
 using MovieLibrary.Data;
 using MovieLibrary.ViewModels;
 using MovieLibrary.Views;
+using RabbitMqHelper.Handlers;
+using RabbitMqHelper.Interfaces;
+using RabbitMqHelper.Settings;
 using System;
 using System.Windows;
 
@@ -68,7 +71,8 @@ namespace MovieLibrary
             });
 
             services.AddSingleton<IDataSource, MovieService>();
-            services.AddSingleton<IRabbitMqService, RabbitMqService>();
+            services.Configure<RabbitMQSettings>(Configuration.GetSection("RabbitMQSettings"));
+            services.AddSingleton<IRabbitMqRequestSender, RabbitMqRequestSender>();
 
             // Viewmodels
             services.AddTransient<MainViewModel>();

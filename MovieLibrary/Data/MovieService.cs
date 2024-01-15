@@ -10,17 +10,14 @@
  *
  *****************************************************************************/
 
-using Microsoft.Extensions.Configuration;
 using MovieData.Dtos;
 using MovieData.Entitys;
 using MovieData.Helpers;
 using MovieData.Interfaces;
 using Newtonsoft.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+using RabbitMqHelper.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MovieLibrary.Data
@@ -29,15 +26,15 @@ namespace MovieLibrary.Data
     {
         #region Private Fields
 
-        private readonly IRabbitMqService _rabbitMqService;
+        private readonly IRabbitMqRequestSender _rabbitMqSender;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public MovieService(IRabbitMqService rabbitMqService)
+        public MovieService(IRabbitMqRequestSender rabbitMqSender)
         {
-            _rabbitMqService=rabbitMqService;
+            _rabbitMqSender = rabbitMqSender;
         }
 
         #endregion Public Constructors
@@ -50,14 +47,14 @@ namespace MovieLibrary.Data
         /// Gets the categories async.
         /// </summary>
         /// <returns>A Task.</returns>
-        public Task<List<Category>> GetCategoriesAsync()
+        public async Task<List<Category>> GetCategoriesAsync()
         {
             var correlationId = Guid.NewGuid().ToString();
             var message = new { MethodName = "GetCategoriesAsync", Parameters = new object[] { } };
 
-            var response = _rabbitMqService.SendRequestAndWaitForResponse(message, correlationId);
+            var response = await _rabbitMqSender.SendRequestAndWaitForResponseAsync(message, correlationId);
 
-            return Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(response));
+            return await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(response));
         }
 
 
@@ -66,14 +63,14 @@ namespace MovieLibrary.Data
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns>A Task.</returns>
-        public Task<MovieDto> GetMovieDtoByIdAsync(int id)
+        public async Task<MovieDto> GetMovieDtoByIdAsync(int id)
         {
             var correlationId = Guid.NewGuid().ToString();
             var message = new { MethodName = "GetMovieDtoByIdAsync", Parameters = new object[] { id } };
 
-            var response = _rabbitMqService.SendRequestAndWaitForResponse(message, correlationId);
+            var response = await _rabbitMqSender.SendRequestAndWaitForResponseAsync(message, correlationId);
 
-            return Task.FromResult(JsonConvert.DeserializeObject<MovieDto>(response));
+            return await Task.FromResult(JsonConvert.DeserializeObject<MovieDto>(response));
         }
 
         /// <summary>
@@ -81,14 +78,14 @@ namespace MovieLibrary.Data
         /// </summary>
         /// <param name="selectAndOrder">The select and order.</param>
         /// <returns>A Task.</returns>
-        public Task<List<MovieLightDto>> GetMovieListAsync(SelectAndOrder? selectAndOrder = null)
+        public async Task<List<MovieLightDto>> GetMovieListAsync(SelectAndOrder? selectAndOrder = null)
         {
             var correlationId = Guid.NewGuid().ToString();
             var message = new { MethodName = "GetMovieListAsync", Parameters = new object[] { selectAndOrder } };
 
-            var response = _rabbitMqService.SendRequestAndWaitForResponse(message, correlationId);
+            var response = await _rabbitMqSender.SendRequestAndWaitForResponseAsync(message, correlationId);
 
-            return Task.FromResult(JsonConvert.DeserializeObject<List<MovieLightDto>>(response));
+            return await Task.FromResult(JsonConvert.DeserializeObject<List<MovieLightDto>>(response));
         }
 
         #endregion Public Methods

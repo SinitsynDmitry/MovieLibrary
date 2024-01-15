@@ -13,6 +13,10 @@
 using MovieData.Interfaces;
 using MovieLibraryWorkerService;
 using MovieLibraryWorkerService.Data;
+using RabbitMqHelper.Handlers;
+using RabbitMqHelper.Interfaces;
+using RabbitMqHelper.Settings;
+
 
 internal class Program
 {
@@ -28,9 +32,16 @@ internal class Program
             options.ServiceName = "Movie Library Service";
         });
         builder.Services.AddHostedService<Worker>();
-        builder.Services.AddSingleton<IDataSource, MovieRepository>();
+        builder.Services.Configure<RabbitMQSettings>(builder.Configuration.GetSection("RabbitMQSettings"));
 
+        builder.Services.AddSingleton<IDataSource, MovieRepository>();
+        builder.Services.AddSingleton<IRabbitMqReplyHandlerFiller, RabbitMqReplyHandlerFiller>();
+        builder.Services.AddSingleton<IRabbitMqReplyHandler, RabbitMqReplyHandler>();
+
+
+       
         var host = builder.Build();
         host.Run();
     }
+    
 }

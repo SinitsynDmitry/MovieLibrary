@@ -1,0 +1,103 @@
+﻿extensions: designer.cs generated.cs
+extensions: .cs .cpp .h
+/******************************************************************************
+ *
+ * File: %FileName%
+ *
+ * Description: %FileName% class and he's methods.
+ *
+ * Copyright (C) %CurrentYear% by Dmitry Sinitsyn
+ *
+ * Date: %CurrentDay%.%CurrentMonth%.%CurrentYear%	 Authors:  Dmitry Sinitsyn
+ *
+ *****************************************************************************/
+
+extensions: .css
+/*
+ ******************************************************************************
+ *
+ * File: %FileName%
+ *
+ * Description: A lot of styles for %FileName% css.
+ *
+ * Copyright (C) %CurrentYear% by Dmitry Sinitsyn
+ *
+ * Date: %CurrentDay%.%CurrentMonth%.%CurrentYear%	 Authors: Dmitry Sinitsyn
+ *
+ *****************************************************************************
+*/
+
+extensions: .aspx .ascx
+<%-- 
+******************************************************************************
+ *
+ * File: %FileName%
+ *
+ * Description: Markup.
+ *
+ * Copyright (C) %CurrentYear% by Dmitry Sinitsyn
+ *
+ * Date: %CurrentDay%.%CurrentMonth%.%CurrentYear%	 Authors:  Dmitry Sinitsyn
+ *
+ *****************************************************************************
+--%>
+
+extensions: .xaml .axaml
+<!--
+******************************************************************************
+ *
+ * File: %FileName%
+ *
+ * Description: Markup.
+ *
+ * Copyright (C) %CurrentYear% by Dmitry Sinitsyn
+ *
+ * Date: %CurrentDay%.%CurrentMonth%.%CurrentYear%	 Authors:  Dmitry Sinitsyn
+ *
+ *****************************************************************************
+-->
+
+extensions:  .config 
+<!--
+******************************************************************************
+ *
+ * File: %FileName%
+ *
+ * Description: Configuration file.
+ *
+ * Copyright (C) %CurrentYear% by Dmitry Sinitsyn
+ *
+ * Date: %CurrentDay%.%CurrentMonth%.%CurrentYear%	 Authors:  Dmitry Sinitsyn
+ *
+ *****************************************************************************
+-->
+
+extensions: .cshtml
+@*
+******************************************************************************
+ *
+ * File: %FileName%
+ *
+ * Description: View for   controller  %FileName% action.
+ *
+ * Copyright (C) %CurrentYear% by Dmitry Sinitsyn
+ *
+ * Date: %CurrentDay%.%CurrentMonth%.%CurrentYear%	 Authors:  Dmitry Sinitsyn
+ *
+ *****************************************************************************
+*@
+
+extensions: .js
+/*
+******************************************************************************
+ *
+ * File: %FileName%
+ *
+ * Description: A lot of usefull methods.
+ *
+ * Copyright (C) %CurrentYear% by Dmitry Sinitsyn
+ *
+ * Date: %CurrentDay%.%CurrentMonth%.%CurrentYear%	 Authors:  Dmitry Sinitsyn
+ *
+ *****************************************************************************
+*/

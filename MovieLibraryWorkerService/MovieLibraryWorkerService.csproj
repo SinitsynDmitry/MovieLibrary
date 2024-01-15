@@ -20,5 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MovieData\MovieData.csproj" />
+    <ProjectReference Include="..\RabbitMqHelper\RabbitMqHelper.csproj" />
   </ItemGroup>
 </Project>

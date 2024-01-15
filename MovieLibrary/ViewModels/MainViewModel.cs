@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Threading;
 
 namespace MovieLibrary.ViewModels
 {
@@ -133,7 +134,12 @@ namespace MovieLibrary.ViewModels
         /// </summary>
         private async void FilterMovies()
         {
-            FilteredMovies.Clear();
+            var action = () =>
+            {
+                FilteredMovies.Clear();
+            };
+
+            DispatcherInvoke(action);
 
             var select = new SelectAndOrder()
             {
@@ -147,10 +153,15 @@ namespace MovieLibrary.ViewModels
 
                 if (filteredMovies != null)
                 {
-                    foreach (var item in filteredMovies)
+                    action = () =>
                     {
-                        FilteredMovies.Add(item);
-                    }
+                        foreach (var item in filteredMovies)
+                        {
+                            FilteredMovies.Add(item);
+                        }
+                    };
+
+                    DispatcherInvoke(action);
                 }
             }
             catch (TimeoutException toex)
@@ -213,10 +224,15 @@ namespace MovieLibrary.ViewModels
                 var _categories = await _movieService.GetCategoriesAsync();
                 if (_categories != null)
                 {
-                    foreach (var item in _categories)
+                    var action = () =>
                     {
-                        Categories.Add(item);
-                    }
+                        foreach (var item in _categories)
+                        {
+                            Categories.Add(item);
+                        }
+                    };
+
+                    DispatcherInvoke(action);
                 }
 
                 // Initially load all movies
@@ -228,6 +244,27 @@ namespace MovieLibrary.ViewModels
                 // throw;
             }
         }
+
+        /// <summary>
+        /// Dispatchers the invoke.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        private void DispatcherInvoke(Action action)
+        {
+            if (Application.Current.Dispatcher.CheckAccess())
+            {
+                action();
+            }
+            else
+            {
+                // You are on a different thread, use Dispatcher.Invoke
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    action();
+                });
+            }
+        }
+
         /// <summary>
         /// Mains the view model_ property changed.
         /// </summary>
