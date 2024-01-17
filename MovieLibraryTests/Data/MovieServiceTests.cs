@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using RabbitMqHelper.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using MovieData.Dtos;
 using Newtonsoft.Json;
-using RabbitMqHelper.Interfaces;
 
 namespace MovieLibrary.Data.Tests
 {
@@ -19,7 +19,7 @@ namespace MovieLibrary.Data.Tests
             var expectedMovieDto = new MovieDto(1, "The Matrix", "Computer programmer", 4, 1999, "Action");
 
             var rabbitMqMock = new Mock<IRabbitMqRequestSender>();
-            rabbitMqMock.Setup(service => service.SendRequestAndWaitForResponseAsync(It.IsAny<object>(), It.IsAny<string>()))
+            rabbitMqMock.Setup(service => service.SendAndWaitAsync(It.IsAny<object>()))
                 .ReturnsAsync(JsonConvert.SerializeObject(expectedMovieDto));
 
             var movieService = new MovieService(rabbitMqMock.Object);
@@ -49,7 +49,7 @@ namespace MovieLibrary.Data.Tests
 
             // Mocking RabbitMQ behavior
             var rabbitMqMock = new Mock<IRabbitMqRequestSender>();
-            rabbitMqMock.Setup(service => service.SendRequestAndWaitForResponseAsync(It.IsAny<object>(), It.IsAny<string>()))
+            rabbitMqMock.Setup(service => service.SendAndWaitAsync(It.IsAny<object>()))
                 .ReturnsAsync(JsonConvert.SerializeObject(expectedMovieList));
 
             // Create an instance of the service with the mocked repository

@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2024 by Dmitry Sinitsyn
  *
- * Date: 15.1.2024	 Authors:  Dmitry Sinitsyn
+ * Date: 17.1.2024	 Authors:  Dmitry Sinitsyn
  *
  *****************************************************************************/
 
@@ -22,14 +22,11 @@ using System.Text;
 
 namespace RabbitMqHelper.Handlers
 {
-    public class RabbitMqReplyHandler : IDisposable, IRabbitMqReplyHandler
+    public class RabbitMqReplyHandler : BaseRabbitMqHandler , IRabbitMqReplyHandler
     {
         #region Private Fields
 
-        private readonly IModel _channel;
-        private readonly IConnection _connection;
-        private readonly IDictionary<string, Func<JArray, Task<string>>> _functions;
-        private readonly ILogger<RabbitMqReplyHandler> _logger;
+        private IDictionary<string, Func<JArray, Task<string>>> _functions;
         private readonly string _queueName = "data_queue";
 
         #endregion Private Fields
@@ -38,23 +35,12 @@ namespace RabbitMqHelper.Handlers
 
         public RabbitMqReplyHandler(
             IOptions<RabbitMQSettings> rabbitMQSettings,
-            IRabbitMqReplyHandlerFiller filler,
-            ILogger<RabbitMqReplyHandler> logger)
+            ILogger<RabbitMqReplyHandler> logger,
+            IRabbitMqReplyHandlerFiller filler):base(rabbitMQSettings, logger)
         {
-            _logger = logger;
-            _queueName = rabbitMQSettings.Value.QueueName;
-
             ArgumentNullException.ThrowIfNull(filler);
             _functions = filler.GetFunctions();
-
-            var factory = new ConnectionFactory()
-            {
-                HostName = rabbitMQSettings.Value.HostName,
-                Port = rabbitMQSettings.Value.Port
-            };
-
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
+            _queueName = rabbitMQSettings.Value.QueueName;
 
             _channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
         }
@@ -63,42 +49,24 @@ namespace RabbitMqHelper.Handlers
 
         #region Public Methods
 
-        /// <summary>
-        /// Disposes the.
-        /// </summary>
-        public void Dispose()
-        {
-            _channel.Close();
-            _connection.Close();
-        }
+
 
         /// <summary>
-        /// Starts the.
+        /// Start receive and reply.
         /// </summary>
-        public void Start()
-        {
-            var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += async (model, ea) =>
+        public void Start_ReceiveAndReply()
+        {           
+            EventHandler<BasicDeliverEventArgs> responseHandler = null;
+            responseHandler = GetReceivedHandler("", async (message, correlationId, replyTo) =>
             {
-                try
-                {
-                    var body = ea.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
+                var response = await HandleMessage(message);
 
-                    var response = await HandleMessage(message);
+                Reply(response, correlationId, replyTo);
+            });
 
-                    var correlationId = ea.BasicProperties.CorrelationId;
-                    var replyTo = ea.BasicProperties.ReplyTo;
+            _consumer.Received += responseHandler;
 
-                    Reply(correlationId, replyTo, response);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(new EventId(), ex, ex.Message);
-                }
-            };
-
-            _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: consumer);
+            _channel.BasicConsume(queue: _queueName, autoAck: true, consumer: _consumer);
         }
 
         #endregion Public Methods
@@ -135,10 +103,10 @@ namespace RabbitMqHelper.Handlers
         /// <summary>
         /// Replies the.
         /// </summary>
+        /// <param name="response">The response.</param>
         /// <param name="correlationId">The correlation id.</param>
         /// <param name="replyTo">The reply to.</param>
-        /// <param name="response">The response.</param>
-        private void Reply(string correlationId, string replyTo, string response)
+        private void Reply(string response, string correlationId, string replyTo)
         {
             var replyProperties = _channel.CreateBasicProperties();
             replyProperties.CorrelationId = correlationId;

@@ -6,28 +6,25 @@
  *
  * Copyright (C) 2024 by Dmitry Sinitsyn
  *
- * Date: 15.1.2024	 Authors:  Dmitry Sinitsyn
+ * Date: 17.1.2024	 Authors:  Dmitry Sinitsyn
  *
  *****************************************************************************/
 
-
+using RabbitMqHelper.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMqHelper.Interfaces;
 using RabbitMqHelper.Settings;
 using System.Text;
 
 namespace RabbitMqHelper.Handlers
 {
-    public class RabbitMqRequestSender: IRabbitMqRequestSender,IDisposable
+    public class RabbitMqRequestSender: BaseRabbitMqHandler, IRabbitMqRequestSender
     {
         #region Private Fields
 
-        private readonly IModel _channel;
-        private readonly IConnection _connection;
-        private readonly EventingBasicConsumer _consumer;
         private readonly string _replyQueueName;
         private readonly string _routingKey;
 
@@ -35,20 +32,12 @@ namespace RabbitMqHelper.Handlers
 
         #region Public Constructors
 
-        public RabbitMqRequestSender(IOptions<RabbitMQSettings> rabbitMQSettings)
+        public RabbitMqRequestSender(IOptions<RabbitMQSettings> rabbitMQSettings, ILogger<RabbitMqRequestSender> logger=null) : base(rabbitMQSettings, logger)
         {
             _routingKey = rabbitMQSettings.Value.QueueName;
 
-            var factory = new ConnectionFactory()
-            {
-                HostName = rabbitMQSettings.Value.HostName,
-                Port = rabbitMQSettings.Value.Port
-            };
-
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
             _replyQueueName = _channel.QueueDeclare().QueueName;
-            _consumer = new EventingBasicConsumer(_channel);
+
             _channel.BasicConsume(queue: _replyQueueName, autoAck: true, consumer: _consumer);
         }
 
@@ -57,24 +46,14 @@ namespace RabbitMqHelper.Handlers
         #region Public Methods
 
         /// <summary>
-        /// Disposes the.
-        /// </summary>
-        public void Dispose()
-        {
-            _channel.Close();
-            _connection.Close();
-        }
-
-        /// <summary>
         /// Sends the request and wait for response async.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="correlationId">The correlation id.</param>
         /// <returns>A Task.</returns>
-        public async Task<string> SendRequestAndWaitForResponseAsync(object message, string correlationId)
+        public async Task<string> SendAndWaitAsync(object message)
         {
             EventHandler<BasicDeliverEventArgs> responseHandler = null;
-
+            var correlationId = Guid.NewGuid().ToString();
             try
             {
                 var props = _channel.CreateBasicProperties();
@@ -87,15 +66,7 @@ namespace RabbitMqHelper.Handlers
 
                 var tcs = new TaskCompletionSource<string>();
 
-                responseHandler = (model, ea) =>
-                {
-                    if (ea.BasicProperties.CorrelationId == correlationId)
-                    {
-                        var responseBytes = ea.Body.ToArray();
-                        var response = Encoding.UTF8.GetString(responseBytes);
-                        tcs.SetResult(response);
-                    }
-                };
+                responseHandler = GetReceivedHandler(correlationId, (response, correlationId, replyTo) => { tcs.SetResult(response); });
 
                 _consumer.Received += responseHandler;
 
@@ -123,6 +94,7 @@ namespace RabbitMqHelper.Handlers
                 }
             }
         }
+
 
         #endregion Public Methods
     }

@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MovieLibraryWorkerService",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MovieLibraryTests", "MovieLibraryTests\MovieLibraryTests.csproj", "{4AFE7A33-FFB1-4700-9E21-4B3B6FA45F76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMqHelper", "RabbitMqHelper\RabbitMqHelper.csproj", "{877E2151-B0DA-4E7D-95BF-A674D1967A52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMqHelper", "RabbitMqHelper\RabbitMqHelper.csproj", "{877E2151-B0DA-4E7D-95BF-A674D1967A52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,11 +2,11 @@
  *
  * File: IRabbitMqReplyHandler.cs
  *
- * Description: IRabbitMqReplyHandler.cs class and he's methods.
+ * Description: IRabbitMqReplyHandler.cs interface.
  *
  * Copyright (C) 2024 by Dmitry Sinitsyn
  *
- * Date: 15.1.2024	 Authors:  Dmitry Sinitsyn
+ * Date: 17.1.2024	 Authors:  Dmitry Sinitsyn
  *
  *****************************************************************************/
 
@@ -21,6 +21,6 @@ namespace RabbitMqHelper.Interfaces
         /// <summary>
         /// Starts the.
         /// </summary>
-        void Start();
+        void Start_ReceiveAndReply();
     }
 }

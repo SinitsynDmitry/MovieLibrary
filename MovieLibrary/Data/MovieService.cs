@@ -49,10 +49,9 @@ namespace MovieLibrary.Data
         /// <returns>A Task.</returns>
         public async Task<List<Category>> GetCategoriesAsync()
         {
-            var correlationId = Guid.NewGuid().ToString();
             var message = new { MethodName = "GetCategoriesAsync", Parameters = new object[] { } };
 
-            var response = await _rabbitMqSender.SendRequestAndWaitForResponseAsync(message, correlationId);
+            var response = await _rabbitMqSender.SendAndWaitAsync(message);
 
             return await Task.FromResult(JsonConvert.DeserializeObject<List<Category>>(response));
         }
@@ -65,10 +64,9 @@ namespace MovieLibrary.Data
         /// <returns>A Task.</returns>
         public async Task<MovieDto> GetMovieDtoByIdAsync(int id)
         {
-            var correlationId = Guid.NewGuid().ToString();
             var message = new { MethodName = "GetMovieDtoByIdAsync", Parameters = new object[] { id } };
 
-            var response = await _rabbitMqSender.SendRequestAndWaitForResponseAsync(message, correlationId);
+            var response = await _rabbitMqSender.SendAndWaitAsync(message);
 
             return await Task.FromResult(JsonConvert.DeserializeObject<MovieDto>(response));
         }
@@ -80,10 +78,9 @@ namespace MovieLibrary.Data
         /// <returns>A Task.</returns>
         public async Task<List<MovieLightDto>> GetMovieListAsync(SelectAndOrder? selectAndOrder = null)
         {
-            var correlationId = Guid.NewGuid().ToString();
             var message = new { MethodName = "GetMovieListAsync", Parameters = new object[] { selectAndOrder } };
 
-            var response = await _rabbitMqSender.SendRequestAndWaitForResponseAsync(message, correlationId);
+            var response = await _rabbitMqSender.SendAndWaitAsync(message);
 
             return await Task.FromResult(JsonConvert.DeserializeObject<List<MovieLightDto>>(response));
         }

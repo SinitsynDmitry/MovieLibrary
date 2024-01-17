@@ -62,7 +62,7 @@ namespace MovieLibraryWorkerService
         /// <returns>A Task.</returns>
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _rabbitHandler.Start();
+            _rabbitHandler.Start_ReceiveAndReply();
 
             return Task.CompletedTask;
         }
